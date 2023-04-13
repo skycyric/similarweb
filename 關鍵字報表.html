@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen"
+        href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/base/jquery-ui.css">
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        .date-picker-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .date-picker-container label {
+            margin-bottom: 5px;
+        }
+
+        pre {
+            background-color: #f6f8fa;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 10px;
+            white-space: pre-wrap;
+        }
+
+        #submitBtn {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .ui-datepicker-calendar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Similarweb API Response</h1>
+    <div class="date-picker-container">
+        <div class="date-picker-column">
+            <label for="startDate">開始月份</label>
+            <input name="startDate" id="startDate" class="date-picker" autocomplete="off" />
+        </div>
+        <div class="date-picker-column">
+            <label for="endDate">結束月份</label>
+            <input name="endDate" id="endDate" class="date-picker" autocomplete="off" />
+        </div>
+        <button id="submitBtn">Submit</button>
+    </div>
+    <pre id="response"></pre>
+    <script>
+        const options = { method: 'GET', headers: { accept: 'application/json' } };
+        const apiKey = "81aa3fc0ace24fdcbf5ebcf73f79a8ff";
+        let startDate = '';
+        let endDate = '';
+        const country = "tw";
+        const metrics = "traffic,organic-vs-paid,volume,cpc";
+        const format = "json";
+        const limit = 100;
+        const keyword = "*c347d6bc-1891-410c-b05b-a878e8054196";
+
+        $(function () {
+            $('.date-picker').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'yy-mm',
+                onClose: function (dateText, inst) {
+                    $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+                },
+                beforeShow: function (input, inst) {
+                    inst.settings.defaultDate = null;
+                }
+            });
+        });
+
+        $(function () {
+            $("#startDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: "yy-mm",
+                onClose: function (selectedDate) {
+                    $("#endDate").datepicker("option", "minDate", selectedDate);
+                }
+            });
+
+            $("#endDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: "yy-mm",
+                onClose: function (selectedDate) {
+                    $("#startDate").datepicker("option", "maxDate", selectedDate);
+                }
+            });
+
+            $("#submitBtn").click(function () {
+                startDate = $("#startDate").datepicker("getDate");
+                endDate = $("#endDate").datepicker("getDate");
+                startDate = formatDate(startDate);
+                endDate = formatDate(endDate);
+                console.log('Selected start date:', startDate);
+                console.log('Selected end date:', endDate);
+                const url = `https://api.similarweb.com/v4/keywords/keyword/analysis/organic-competitors?api_key=${apiKey}&keyword=${keyword}&start_date=${startDate}&end_date=${endDate}&country=${country}&metrics=${metrics}&format=${format}&limit=${limit}&userOnlyGroups=true`;
+                // fetch(url, options)
+                //     .then(response => response.json())
+                //     .then(response => {
+                //         document.getElementById('response').textContent = JSON.stringify(response, null, 2);
+                //     })
+                //     .catch(err => console.error(err));
+            });
+            function formatDate(date) {
+                const year = date.getFullYear().toString();
+                const month = ('0' + (date.getMonth() + 1)).slice(-2);
+                return `${year}-${month}`;
+            }
+        });
+    </script>
+</body>
+
+</html>

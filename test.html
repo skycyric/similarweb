@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Similarweb API Response</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        pre {
+            background-color: #f6f8fa;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 10px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Similarweb API Response</h1>
+    <div>
+        <label for="startDate">Start Date:</label>
+        <input type="text" id="startDate">
+    </div>
+    <div>
+        <label for="endDate">End Date:</label>
+        <input type="text" id="endDate">
+    </div>
+    <button id="submitBtn">Submit</button>
+    <pre id="response"></pre>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        const options = { method: 'GET', headers: { accept: 'application/json' } };
+        const apiKey = "81aa3fc0ace24fdcbf5ebcf73f79a8ff";
+        let startDate = "2022-01";
+        let endDate = "2022-03";
+        const country = "tw";
+        const metrics = "traffic,organic-vs-paid,volume,cpc";
+        const format = "json";
+        const limit = 100;
+        const keyword = "*c347d6bc-1891-410c-b05b-a878e8054196"
+        const startDatePicker = flatpickr("#startDate", {
+            dateFormat: "Y-m",
+            defaultDate: startDate,
+            showTime: false,
+            maxDate: new Date().fp_incr(-1),
+            onReady: function () {
+                this.element.blur();
+            },
+            datePicker: {
+                showMonths: 1,
+                mode: "range",
+                position: "right",
+                disable: [
+                    {
+                        from: new Date().fp_incr(1),
+                        to: new Date().fp_incr(2 * 365),
+                    },
+                ],
+                locale: {
+                    firstDayOfWeek: 1,
+                },
+            },
+        });
+
+        const endDatePicker = flatpickr("#endDate", {
+            dateFormat: "Y-m",
+            defaultDate: endDate,
+            showTime: false,
+            maxDate: new Date().fp_incr(-1),
+            onReady: function () {
+                this.element.blur();
+            },
+            datePicker: {
+                showMonths: 1,
+                mode: "range",
+                position: "right",
+                disable: [
+                    {
+                        from: new Date().fp_incr(1),
+                        to: new Date().fp_incr(2 * 365),
+                    },
+                ],
+                locale: {
+                    firstDayOfWeek: 1,
+                },
+            },
+        });
+
+
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.addEventListener("click", fetchData);
+
+        function fetchData() {
+            startDate = $("#startDate").datepicker("getDate").toISOString().slice(0, 7);
+            endDate = $("#endDate").datepicker("getDate").toISOString().slice(0, 7);
+            const url = `https://api.similarweb.com/v4/keywords/keyword/analysis/organic-competitors?api_key=${apiKey}&keyword=${keyword}&start_date=${startDate}&end_date=${endDate}&country=${country}&metrics=${metrics}&format=${format}&limit=${limit}&userOnlyGroups=true`;
+            fetch(url, options)
+                .then(response => response.json())
+                .then(response => {
+                    document.getElementById('response').textContent = JSON.stringify(response, null, 2);
+                })
+                .catch(err => console.error(err));
+        }
+    </script>
+</body>
+
+</html>
