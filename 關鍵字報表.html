@@ -14,7 +14,7 @@
     <label for="end-date">結束日期：</label>
     <input type="month" id="end-date">
     <br><br>
-    <button onclick="getApiData()">送出</button>
+    <button onclick="getApiData()">查詢</button>
     <br><br>
     <h2>API 回應：</h2>
     <pre id="api-response"></pre>
@@ -30,8 +30,8 @@
         let endDate = '';
 
         function getApiData() {
-            startDate = moment(document.getElementById("start-date").value).format("YYYY-MM-DD");
-            endDate = moment(document.getElementById("end-date").value).format("YYYY-MM-DD");
+            startDate = moment(document.getElementById("start-date").value).format("YYYY-MM");
+            endDate = moment(document.getElementById("end-date").value).format("YYYY-MM");
 
             const url = `https://api.similarweb.com/v4/keywords/keyword/analysis/organic-competitors?api_key=${apiKey}&keyword=${keyword}&start_date=${startDate}&end_date=${endDate}&country=${country}&metrics=${metrics}&format=${format}&limit=${limit}&userOnlyGroups=true`;
 
