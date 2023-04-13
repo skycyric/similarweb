@@ -2,107 +2,183 @@
 <html>
 
 <head>
-    <title>Similarweb API Response</title>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- 引入 DataTables CSS 檔案 -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css">
+
+    <!-- 引入 jQuery -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 引入 DataTables JavaScript 檔案 -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.min.js"></script>
+    <!-- 在 HTML 檔案的底部加上以下 CSS 樣式 -->
     <style>
-        pre {
-            background-color: #f6f8fa;
-            border-radius: 3px;
-            font-family: 'Courier New', Courier, monospace;
+        /* 設定表格邊框線 */
+        #my-table {
+            border-collapse: collapse;
+            border: 1px solid black;
+        }
+
+        /* 設定表格標頭和表格內容的背景顏色 */
+        #my-table thead th {
+            background-color: #e0e0e0;
+        }
+
+        #my-table tbody td {
+            background-color: #f8f8f8;
+        }
+
+        /* 設定表格標頭和表格內容的文字對齊方式 */
+        #my-table thead th,
+        #my-table tbody td {
+            text-align: center;
+        }
+
+        /* 設定表格內容字體大小 */
+        #my-table tbody td {
+            font-size: 14px;
+        }
+
+        /* 設定表格標頭的高度 */
+        #my-table thead th {
+            height: 50px;
+        }
+
+        /* 設定表格標頭和表格內容的邊框線 */
+        #my-table thead th,
+        #my-table tbody td {
+            border: 1px solid black;
+        }
+
+        /* 設定表格標頭和表格內容的內邊距 */
+        #my-table thead th,
+        #my-table tbody td {
             padding: 10px;
-            white-space: pre-wrap;
+        }
+
+        /* 設定表格標頭和表格內容的 hover 效果 */
+        #my-table tbody tr:hover {
+            background-color: #d9d9d9;
+        }
+
+        /* 設定表格的搜索框的外觀 */
+        div.dataTables_wrapper div.dataTables_filter input {
+            width: auto;
+            margin-left: 5px;
+        }
+
+        /* 設定表格的分頁選項的外觀 */
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+            margin: 0;
+        }
+
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button {
+            margin: 0;
+        }
+
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button.active a {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
         }
     </style>
+
 </head>
+<!-- 在 HTML 檔案中建立一個表格的容器 -->
 
 <body>
-    <h1>Similarweb API Response</h1>
-    <div>
-        <label for="startDate">Start Date:</label>
-        <input type="text" id="startDate">
-    </div>
-    <div>
-        <label for="endDate">End Date:</label>
-        <input type="text" id="endDate">
-    </div>
-    <button id="submitBtn">Submit</button>
-    <pre id="response"></pre>
-
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <table id="my-table">
+        <thead>
+            <tr>
+                <th>Domain</th>
+                <th>Traffic Share</th>
+                <th>Position</th>
+                <th>Destination URL</th>
+                <th>Website Categories</th>
+            </tr>
+        </thead>
+    </table>
+    <button id="export-csv-btn" class="export-button">匯出 CSV 檔案</button>
+    <!-- 在 HTML 檔案的底部加上以下 JavaScript 代碼 -->
     <script>
-        const options = { method: 'GET', headers: { accept: 'application/json' } };
-        const apiKey = "81aa3fc0ace24fdcbf5ebcf73f79a8ff";
-        let startDate = "2022-01";
-        let endDate = "2022-03";
-        const country = "tw";
-        const metrics = "traffic,organic-vs-paid,volume,cpc";
-        const format = "json";
-        const limit = 100;
-        const keyword = "*c347d6bc-1891-410c-b05b-a878e8054196"
-        const startDatePicker = flatpickr("#startDate", {
-            dateFormat: "Y-m",
-            defaultDate: startDate,
-            showTime: false,
-            maxDate: new Date().fp_incr(-1),
-            onReady: function () {
-                this.element.blur();
-            },
-            datePicker: {
-                showMonths: 1,
-                mode: "range",
-                position: "right",
-                disable: [
+        $(document).ready(function () {
+            // 取得 JSON 資料
+            const data = {
+                "traffic_breakdown": [
                     {
-                        from: new Date().fp_incr(1),
-                        to: new Date().fp_incr(2 * 365),
+                        "domain": "paulaschoice.com.tw",
+                        "traffic_share": 0.05014885501788759,
+                        "position": 11,
+                        "destination_url": "https://www.paulaschoice.com.tw/learn.php?learn=2263",
+                        "website_categories": "Lifestyle/Beauty_and_Cosmetics"
                     },
-                ],
-                locale: {
-                    firstDayOfWeek: 1,
-                },
-            },
+                    {
+                        "domain": "commonhealth.com.tw",
+                        "traffic_share": 0.04456821631659598,
+                        "position": 11,
+                        "destination_url": "https://www.commonhealth.com.tw/article/63611",
+                        "website_categories": "Health/Health"
+                    },
+                    {
+                        "domain": "tw.news.yahoo.com",
+                        "traffic_share": 0.04358301952180401,
+                        "position": 17,
+                        "destination_url": "https://tw.news.yahoo.com/%E6%AF%9B%E5%AD%94%E8%82%8C%E3%80%8C-2022-%E9%85%B8%E9%A1%9E%E7%B2%BE%E8%8F%AF%E6%8E%A8%E8%96%A6%E",
+                        "website_categories": "News_and_Media"
+                    }
+                ]
+            };
+
+            // 初始化 DataTables
+            $('#my-table').DataTable({
+                data: data.traffic_breakdown,
+                columns: [
+                    { data: 'domain' },
+                    { data: 'traffic_share' },
+                    { data: 'position' },
+                    {
+                        data: 'destination_url',
+                        render: function (data, type, row) {
+                            return '<a href="' + data + '">' + data + '</a>';
+                        }
+                    },
+                    { data: 'website_categories' }
+                ]
+            });
+        });
+        // 匯出 CSV 檔案
+        $('#export-csv-btn').click(function () {
+            // 取得 DataTables 實例
+            const table = $('#my-table').DataTable();
+
+            // 取得資料
+            const data = table.data();
+
+            // 取得欄位名稱
+            const columns = table.columns().header().toArray().map(function (th) {
+                return $(th).text();
+            });
+
+            // 建立 CSV 檔案的內容
+            const csvContent = "data:text/csv;charset=utf-8," +
+                columns.join(",") +
+                "\r\n" +
+                data.map(function (row) {
+                    return Object.values(row).join(",");
+                }).join("\r\n");
+
+            // 建立下載連結
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "data.csv");
+            document.body.appendChild(link); // Required for FF
+
+            // 模擬點擊下載連結
+            link.click();
+
+            // 刪除下載連結
+            document.body.removeChild(link);
         });
 
-        const endDatePicker = flatpickr("#endDate", {
-            dateFormat: "Y-m",
-            defaultDate: endDate,
-            showTime: false,
-            maxDate: new Date().fp_incr(-1),
-            onReady: function () {
-                this.element.blur();
-            },
-            datePicker: {
-                showMonths: 1,
-                mode: "range",
-                position: "right",
-                disable: [
-                    {
-                        from: new Date().fp_incr(1),
-                        to: new Date().fp_incr(2 * 365),
-                    },
-                ],
-                locale: {
-                    firstDayOfWeek: 1,
-                },
-            },
-        });
-
-
-        const submitBtn = document.getElementById("submitBtn");
-        submitBtn.addEventListener("click", fetchData);
-
-        function fetchData() {
-            startDate = $("#startDate").datepicker("getDate").toISOString().slice(0, 7);
-            endDate = $("#endDate").datepicker("getDate").toISOString().slice(0, 7);
-            const url = `https://api.similarweb.com/v4/keywords/keyword/analysis/organic-competitors?api_key=${apiKey}&keyword=${keyword}&start_date=${startDate}&end_date=${endDate}&country=${country}&metrics=${metrics}&format=${format}&limit=${limit}&userOnlyGroups=true`;
-            fetch(url, options)
-                .then(response => response.json())
-                .then(response => {
-                    document.getElementById('response').textContent = JSON.stringify(response, null, 2);
-                })
-                .catch(err => console.error(err));
-        }
     </script>
 </body>
 

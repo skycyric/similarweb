@@ -4,15 +4,16 @@
 <head>
     <title>Moment.js Demo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
     <h1>日期選擇器</h1>
     <label for="start-date">開始日期：</label>
-    <input type="month" id="start-date">
+    <input type="month" id="start-date" min="" max="">
     <br><br>
     <label for="end-date">結束日期：</label>
-    <input type="month" id="end-date">
+    <input type="month" id="end-date" min="" max="">
     <br><br>
     <button onclick="getApiData()">查詢</button>
     <br><br>
@@ -20,11 +21,31 @@
     <pre id="api-response"></pre>
 
     <script>
+        const today = moment();
+        const minDate = today.clone().subtract(12, 'months').format('YYYY-MM');
+        const maxDate = today.format('YYYY-MM')
+
+        document.getElementById("start-date").min = minDate;
+        document.getElementById("start-date").max = maxDate;
+        document.getElementById("end-date").min = minDate;
+        document.getElementById("end-date").max = maxDate;
+        document.getElementById("start-date").addEventListener("change", function () {
+            const startDate = moment(this.value);
+            const endDateInput = document.getElementById("end-date");
+            const currentEndDate = moment(endDateInput.value);
+
+            if (startDate.isAfter(currentEndDate)) {
+                endDateInput.value = startDate.format('YYYY-MM');
+            }
+
+            endDateInput.min = this.value;
+        });
+
         const apiKey = "81aa3fc0ace24fdcbf5ebcf73f79a8ff";
         const country = "tw";
         const metrics = "traffic,organic-vs-paid,volume,cpc";
         const format = "json";
-        const limit = 100;
+        const limit = 10;
         const keyword = "*c347d6bc-1891-410c-b05b-a878e8054196";
         let startDate = '';
         let endDate = '';
