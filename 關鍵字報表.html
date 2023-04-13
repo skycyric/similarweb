@@ -2,127 +2,46 @@
 <html>
 
 <head>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.js"></script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
-    <link rel="stylesheet" type="text/css" media="screen"
-        href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/base/jquery-ui.css">
-    <style>
-        h1 {
-            text-align: center;
-        }
-
-        .date-picker-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 10px 0;
-        }
-
-        .date-picker-container label {
-            margin-bottom: 5px;
-        }
-
-        pre {
-            background-color: #f6f8fa;
-            border-radius: 3px;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 10px;
-            white-space: pre-wrap;
-        }
-
-        #submitBtn {
-            display: block;
-            margin: 0 auto;
-        }
-
-        .ui-datepicker-calendar {
-            display: none;
-        }
-    </style>
+    <title>Moment.js Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 </head>
 
 <body>
-    <h1>Similarweb API Response</h1>
-    <div class="date-picker-container">
-        <div class="date-picker-column">
-            <label for="startDate">開始月份</label>
-            <input name="startDate" id="startDate" class="date-picker" autocomplete="off" />
-        </div>
-        <div class="date-picker-column">
-            <label for="endDate">結束月份</label>
-            <input name="endDate" id="endDate" class="date-picker" autocomplete="off" />
-        </div>
-        <button id="submitBtn">Submit</button>
-    </div>
-    <pre id="response"></pre>
+    <h1>日期選擇器</h1>
+    <label for="start-date">開始日期：</label>
+    <input type="month" id="start-date">
+    <br><br>
+    <label for="end-date">結束日期：</label>
+    <input type="month" id="end-date">
+    <br><br>
+    <button onclick="getApiData()">送出</button>
+    <br><br>
+    <h2>API 回應：</h2>
+    <pre id="api-response"></pre>
+
     <script>
-        const options = { method: 'GET', headers: { accept: 'application/json' } };
         const apiKey = "81aa3fc0ace24fdcbf5ebcf73f79a8ff";
-        let startDate = '';
-        let endDate = '';
         const country = "tw";
         const metrics = "traffic,organic-vs-paid,volume,cpc";
         const format = "json";
         const limit = 100;
         const keyword = "*c347d6bc-1891-410c-b05b-a878e8054196";
+        let startDate = '';
+        let endDate = '';
 
-        $(function () {
-            $('.date-picker').datepicker({
-                changeMonth: true,
-                changeYear: true,
-                showButtonPanel: true,
-                dateFormat: 'yy-mm',
-                onClose: function (dateText, inst) {
-                    $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
-                },
-                beforeShow: function (input, inst) {
-                    inst.settings.defaultDate = null;
-                }
-            });
-        });
+        function getApiData() {
+            startDate = moment(document.getElementById("start-date").value).format("YYYY-MM-DD");
+            endDate = moment(document.getElementById("end-date").value).format("YYYY-MM-DD");
 
-        $(function () {
-            $("#startDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                showButtonPanel: true,
-                dateFormat: "yy-mm",
-                onClose: function (selectedDate) {
-                    $("#endDate").datepicker("option", "minDate", selectedDate);
-                }
-            });
+            const url = `https://api.similarweb.com/v4/keywords/keyword/analysis/organic-competitors?api_key=${apiKey}&keyword=${keyword}&start_date=${startDate}&end_date=${endDate}&country=${country}&metrics=${metrics}&format=${format}&limit=${limit}&userOnlyGroups=true`;
 
-            $("#endDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                showButtonPanel: true,
-                dateFormat: "yy-mm",
-                onClose: function (selectedDate) {
-                    $("#startDate").datepicker("option", "maxDate", selectedDate);
-                }
-            });
-
-            $("#submitBtn").click(function () {
-                startDate = $("#startDate").datepicker("getDate");
-                endDate = $("#endDate").datepicker("getDate");
-                startDate = formatDate(startDate);
-                endDate = formatDate(endDate);
-                console.log('Selected start date:', startDate);
-                console.log('Selected end date:', endDate);
-                const url = `https://api.similarweb.com/v4/keywords/keyword/analysis/organic-competitors?api_key=${apiKey}&keyword=${keyword}&start_date=${startDate}&end_date=${endDate}&country=${country}&metrics=${metrics}&format=${format}&limit=${limit}&userOnlyGroups=true`;
-                // fetch(url, options)
-                //     .then(response => response.json())
-                //     .then(response => {
-                //         document.getElementById('response').textContent = JSON.stringify(response, null, 2);
-                //     })
-                //     .catch(err => console.error(err));
-            });
-            function formatDate(date) {
-                const year = date.getFullYear().toString();
-                const month = ('0' + (date.getMonth() + 1)).slice(-2);
-                return `${year}-${month}`;
-            }
-        });
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("api-response").innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => console.error(error));
+        }
     </script>
 </body>
 
