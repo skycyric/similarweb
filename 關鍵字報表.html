@@ -4,11 +4,82 @@
 <head>
     <title>Moment.js Demo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.min.js"></script>
+    <style>
+        /* 設定表格邊框線 */
+        #my-table {
+            border-collapse: collapse;
+            border: 1px solid black;
+        }
+
+        /* 設定表格標頭和表格內容的背景顏色 */
+        #my-table thead th {
+            background-color: #e0e0e0;
+        }
+
+        #my-table tbody td {
+            background-color: #f8f8f8;
+        }
+
+        /* 設定表格標頭和表格內容的文字對齊方式 */
+        #my-table thead th {
+            text-align: center;
+        }
+
+        /* 設定表格內容字體大小 */
+        #my-table tbody td {
+            font-size: 14px;
+        }
+
+        /* 設定表格標頭的高度 */
+        #my-table thead th {
+            height: 50px;
+        }
+
+        /* 設定表格標頭和表格內容的邊框線 */
+        #my-table thead th,
+        #my-table tbody td {
+            border: 1px solid black;
+        }
+
+        /* 設定表格標頭和表格內容的內邊距 */
+        #my-table thead th,
+        #my-table tbody td {
+            padding: 10px;
+        }
+
+        /* 設定表格標頭和表格內容的 hover 效果 */
+        #my-table tbody tr:hover {
+            background-color: #d9d9d9;
+        }
+
+        /* 設定表格的搜索框的外觀 */
+        div.dataTables_wrapper div.dataTables_filter input {
+            width: auto;
+            margin-left: 5px;
+        }
+
+        /* 設定表格的分頁選項的外觀 */
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+            margin: 0;
+        }
+
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button {
+            margin: 0;
+        }
+
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button.active a {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>日期選擇器</h1>
+    <h1>日期選擇</h1>
+    <p>只能選擇年、月，可選區間為本月至12個月之前</p>
     <label for="start-date">開始日期：</label>
     <input type="month" id="start-date" min="" max="">
     <br><br>
@@ -17,8 +88,19 @@
     <br><br>
     <button onclick="getApiData()">查詢</button>
     <br><br>
-    <h2>API 回應：</h2>
-    <pre id="api-response"></pre>
+    <h2>關鍵字競網網址</h2>
+    <table id="my-table">
+        <thead>
+            <tr>
+                <th>Domain</th>
+                <th>Traffic Share</th>
+                <th>Position</th>
+                <th>Destination URL</th>
+                <th>Website Categories</th>
+            </tr>
+        </thead>
+    </table>
+    <button id="export-csv-btn" class="export-button">匯出 CSV 檔案</button>
 
     <script>
         const today = moment();
@@ -49,6 +131,7 @@
         const keyword = "*c347d6bc-1891-410c-b05b-a878e8054196";
         let startDate = '';
         let endDate = '';
+        let data = [];
 
         function getApiData() {
             startDate = moment(document.getElementById("start-date").value).format("YYYY-MM");
@@ -58,11 +141,69 @@
 
             fetch(url)
                 .then(response => response.json())
-                .then(data => {
-                    document.getElementById("api-response").innerText = JSON.stringify(data, null, 2);
+                .then(apiData => {
+                    data = apiData.traffic_breakdown;
+                    $('#my-table').DataTable({
+                        data: data,
+                        columns: [
+                            { data: 'domain' },
+                            {
+                                data: 'traffic_share',
+                                render: function (data, type, row) {
+                                    return (data * 100).toFixed(2) + '%';
+                                },
+                            },
+                            { data: 'position' },
+                            {
+                                data: 'destination_url',
+                                render: function (data, type, row) {
+                                    return '<a href="' + data + '">' + data + '</a>';
+                                }
+                            },
+                            { data: 'website_categories' }
+                        ],
+                    });
                 })
                 .catch(error => console.error(error));
         }
+
+        $(document).ready(function () {
+            $('#export-csv-btn').click(function () {
+                // 取得 DataTables 實例
+                const table = $('#my-table').DataTable();
+
+                // 取得資料
+                const data = table.data();
+
+                // 取得欄位名稱
+                const columns = table.columns().header().toArray().map(function (th) {
+                    return $(th).text();
+                });
+
+                // 建立 CSV 檔案的內容
+                const csvContent = "data:text/csv;charset=utf-8," +
+                    columns.join(",") +
+                    "\r\n" +
+                    data.map(function (row) {
+                        return Object.values(row).join(",");
+                    }).join("\r\n");
+
+                // 建立下載連結
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "data.csv");
+                document.body.appendChild(link); // Required for FF
+
+                // 模擬點擊下載連結
+                link.click();
+
+                // 刪除下載連結
+                document.body.removeChild(link);
+            });
+        });
+
+
     </script>
 </body>
 
