@@ -1,10 +1,8 @@
 name: Build and Deploy
-
 on:
   push:
     branches:
       - main
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -13,12 +11,13 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
       - name: Build Site
-        run: |
-          npm install
-          npm run build
+        run: python build.py
       - name: Deploy Site
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.DEPLOY_KEY }}
-          publish_dir: ./dist
+          publish_dir: ./build
+          cname: skycyric.github.io
