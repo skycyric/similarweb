@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Moment.js Demo</title>
+    <title>Similarweb關鍵字各網站流量查詢</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css">
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -77,7 +77,7 @@
 </head>
 
 <body>
-    <h1>關鍵字各網站流量查詢</h1>
+    <h1>Similarweb<br>關鍵字各網站流量查詢</h1>
     <p class="comment">#只能選擇年、月。<br>#可選區間為本月至12個月之前。<br>#數量上限30，按照Traffic Share排序。</p>
     <label>輸入關鍵字：</label>
     <input id="query">
@@ -125,7 +125,7 @@
             endDateInput.min = this.value;
         });
 
-        const apiKey = process.env.API_KEY;
+        const apiKey = "81aa3fc0ace24fdcbf5ebcf73f79a8ff";
         const country = "tw";
         const metrics = "traffic,organic-vs-paid,volume,cpc";
         const format = "json";
