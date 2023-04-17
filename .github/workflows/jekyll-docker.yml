@@ -12,9 +12,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Install Dependencies
-        run: pip install -r requirements.txt
+        run: npm install
       - name: Build Site
-        run: python build.py
+        run: npm run build
       - name: Deploy Site
         uses: peaceiris/actions-gh-pages@v3
         with:
