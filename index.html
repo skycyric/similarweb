@@ -124,17 +124,8 @@
 
             endDateInput.min = this.value;
         });
-        const webpack = require('webpack');
 
-        module.exports = {
-            plugins: [
-                new webpack.DefinePlugin({
-                    'process.env.API_KEY': JSON.stringify(process.env.API_KEY)
-                })
-            ]
-        };
-        const apiKey = process.env.API_KEY;
-        console.log(process.env.API_KEY);
+        const apiKey = '<%= process.env.API_KEY %>';
         const country = "tw";
         const metrics = "traffic,organic-vs-paid,volume,cpc";
         const format = "json";
