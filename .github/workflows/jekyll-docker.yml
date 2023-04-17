@@ -10,7 +10,7 @@ jobs:
       API_KEY: ${{ secrets.API_KEY }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.5.1
       - name: Install Dependencies
         run: npm install
       - name: Build Site
